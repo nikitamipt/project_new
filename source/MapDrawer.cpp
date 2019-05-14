@@ -70,7 +70,8 @@ void Draw() {
 
     bool space1 = false; //отслеживает залипания пробела
     int Drawer = false; // это переменная показывает, нажо ли рисовать
-
+    int waller = false; // for making walls.
+    int wal = false; // just as space1
     while (window.isOpen()){
 
 
@@ -92,14 +93,11 @@ void Draw() {
         if (Keyboard::isKeyPressed(Keyboard::T)) {hhh = 2;}
         if (Keyboard::isKeyPressed(Keyboard::Y)) {hhh = 4;}
         if (Keyboard::isKeyPressed(Keyboard::Space)) {
-            if (!space1) {
-                space1 = true;
-                if (Drawer) {Drawer = false;}
-                else        {Drawer = true;}
+            if (!space1) {      space1 = true;
+                                if (Drawer) {Drawer = false;}
+                                else        {Drawer = true;}
             }
-        } else {
-            space1 = false;
-        }
+        } else { space1 = false; }
         if (Drawer) {
             int xxx = int(pos.x/16) % W1; if (xxx < 0) {xxx = W1 + xxx;}
             int yyy = int(pos.y/16) % H1; if (yyy < 0) {yyy = H1 + yyy;}
@@ -109,9 +107,17 @@ void Draw() {
                 }
             }
         }
+
+
         if (Keyboard::isKeyPressed(Keyboard::Z)) {
-            MapGame[int(pos.x/16) + int(pos.y/16) * W1] = 1; //стенки
-        }
+            if (!wal) {     wal = true;
+                            if (waller) {waller = false;}
+                            else        {waller = true;   }
+            }
+        } else {wal = false;}
+        if (waller) {MapGame[int(pos.x/16) + int(pos.y/16) * W1] = 1;}
+
+
         if (Keyboard::isKeyPressed(Keyboard::X)) {
             MapGame[int(pos.x/16) + int(pos.y/16) * W1] = 2; //финишняя черта
         }
