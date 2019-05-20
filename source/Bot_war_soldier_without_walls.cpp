@@ -1,26 +1,14 @@
 #pragma once
-#include "Player.cpp"
+//#include "Player.cpp"
+#include "Player_without_walls.cpp"
 #include "Neuron_Net.cpp"
 
 
 using namespace sf;
 
 
-//float dist[5] = {3.1415/2, 3.1415/4, 0, -3.1415/4, -3.1415/2};
-
-
-int GetDistace1(int x, int y, float qqq, float da) {
-    int s = 0;
-    while (TileMap[int(y/16)][int(x/16)] == '0') {
-        x += 8 * cos(da + qqq); y += 8 * sin(da + qqq); s++;
-    }
-   // //printf("s = %d\n\n", s);
-    return s;
-}
-
-
 class KohonenNet;
-class Soldier : public Player {
+class Soldier_without_walls : public Player {
 public:
     bool space;
     int lives; //each bot has 3 lives. Num of lives doesn't save them from the wall((
@@ -34,36 +22,33 @@ public:
     unsigned long long  int score;
     ofstream fout;
 
-// ÝÒÎ ÊÎÑÒÛËÜ. ÊÀÊ ÍÅ ÏÎÂÒÎÐßÒÜ ÒÎÒ ÆÅ ÒÅÊÑÒ, ÷òî è PERSON
-    Soldier(Texture &image, int x_start, int y_start, int inputs, int mids, int outs) : Net(inputs, mids, outs){
-        sprite.setTexture(image);  //ñíà÷àëà â sprite çàãðóæàþ êàðòèíó
-        rect = FloatRect(x_start * 16, y_start * 16,16,16);//òåêóùèå êîîðäèíàòû, ãäå ÿ çàñïàìëþñü
+// ÃÃ’ÃŽ ÃŠÃŽÃ‘Ã’Ã›Ã‹Ãœ. ÃŠÃ€ÃŠ ÃÃ… ÃÃŽÃ‚Ã’ÃŽÃÃŸÃ’Ãœ Ã’ÃŽÃ’ Ã†Ã… Ã’Ã…ÃŠÃ‘Ã’, Ã·Ã²Ã® Ã¨ PERSON
+    Soldier_without_walls(Texture &image, int x_start, int y_start, int inputs, int mids, int outs) : Net(inputs, mids, outs){
+        sprite.setTexture(image);  //Ã±Ã­Ã Ã·Ã Ã«Ã  Ã¢ sprite Ã§Ã Ã£Ã°Ã³Ã¦Ã Ã¾ ÃªÃ Ã°Ã²Ã¨Ã­Ã³
+        rect = FloatRect(x_start * 16, y_start * 16,16,16);//Ã²Ã¥ÃªÃ³Ã¹Ã¨Ã¥ ÃªÃ®Ã®Ã°Ã¤Ã¨Ã­Ã Ã²Ã», Ã£Ã¤Ã¥ Ã¿ Ã§Ã Ã±Ã¯Ã Ã¬Ã«Ã¾Ã±Ã¼
         sprite.setPosition(rect.left, rect.top);
         sprite.setTextureRect(IntRect(5*16, 9*16, 16, 16));
         dx = 0; dy = 0; da = 0;
         currentFrame = 0;
-        kills = 0; lives = 1; age = 0; age_without_killing = 0;
+        kills = 0; lives = 3; age = 0; age_without_killing = 0;
         space = false;
         dsp = 1; da = 0;
         life = true;
         last_shot = 0;
     }
 
+
+
     bool control() {
-//printf("Bot 51 \n");
         age++; age_without_killing++;
         if (age_without_killing > 200) {lives--;}
         Net.inNeurons[10]->value = float(clock() - last_shot);
-//printf("Bot 53\n");
         float fight = Net.outNeurons[1]->kernelFunction();
-//printf("fight = %f\n ", fight);
-//printf("Bot 56\n");
         float da1 = float(Net.outNeurons[0]->kernelFunction())/100000000;
 //sprintf("da1 = %f\n\n", da1);
-//printf("Bot 59\n");
         if (da1 < -3.1415/2){da1 = -3.1415/2;} if (da1 > 3.1415/2) {da1 = 3.1415/2;}
         da += da1; dx = dsp*cos(da); dy = dsp*sin(da);
-        if (clock() - last_shot > 2000000 && fight > 4000000) { //ïåðåçàäðÿäêà 1000ìèëèñåê
+        if (clock() - last_shot > 500000 && fight > 4000000) { //Ã¯Ã¥Ã°Ã¥Ã§Ã Ã¤Ã°Ã¿Ã¤ÃªÃ  1000Ã¬Ã¨Ã«Ã¨Ã±Ã¥Ãª
             last_shot = clock();
             return true;
         }

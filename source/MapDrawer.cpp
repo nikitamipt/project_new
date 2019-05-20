@@ -103,7 +103,7 @@ void Draw() {
             int yyy = int(pos.y/16) % H1; if (yyy < 0) {yyy = H1 + yyy;}
             for (int i = -hhh; i <= hhh; i++) {
                 for (int j = - hhh; j <= hhh; j++) {
-                    MapGame[xxx+ i + (yyy + j) * W1] = 0;
+                    MapGame[(xxx + i + W1) % W1 + ((yyy + j + H1) % H1) * W1] = 0;
                 }
             }
         }
@@ -115,17 +115,20 @@ void Draw() {
                             else        {waller = true;   }
             }
         } else {wal = false;}
-        if (waller) {MapGame[int(pos.x/16) + int(pos.y/16) * W1] = 1;}
 
+        int xxx = int(pos.x/16) % W1; if (xxx < 0) {xxx = W1 + xxx;}
+        int yyy = int(pos.y/16) % H1; if (yyy < 0) {yyy = H1 + yyy;}
+
+        if (waller) {MapGame[xxx + yyy * W1] = 1;}
 
         if (Keyboard::isKeyPressed(Keyboard::X)) {
-            MapGame[int(pos.x/16) + int(pos.y/16) * W1] = 2; //финишняя черта
+            MapGame[xxx + yyy * W1] = 2; //финишняя черта
         }
         if (Keyboard::isKeyPressed(Keyboard::C)) {
-            MapGame[int(pos.x/16) + int(pos.y/16) * W1] = 3; //место старта человечка
+            MapGame[xxx + yyy * W1] = 3; //место старта человечка
         }
         if (Keyboard::isKeyPressed(Keyboard::V)) {
-            MapGame[int(pos.x/16) + int(pos.y/16) * W1] = 4; //эта штука нужна для корректной работы Дейкстры. Между стартом человека и линией финиша должна быть линия этой штуки
+            MapGame[xxx + yyy * W1] = 4; //эта штука нужна для корректной работы Дейкстры. Между стартом человека и линией финиша должна быть линия этой штуки
         }
 
 

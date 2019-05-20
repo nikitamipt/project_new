@@ -1,3 +1,9 @@
+/*
+git add .
+git commit -m "draw+map_war"
+git push origin master
+*/
+
 #pragma once
 
 #include <SFML/Graphics.hpp>
@@ -37,7 +43,7 @@ using namespace sf;
 
 
 
-int view_distance = 20; //distance that bot can see
+int view_distance = 50; //distance that bot can see
 
 // áóäó ðàñ÷èòûâàòü èç ñîîáðàæåíèé, ÷òî íà îäíîãî áîòà âûõîäèò bot_squre êâ åä ïëîùàäè (íå õàðîìû, íî è íå îáùàãà â Äîëãîïå)
 int bot_squre  = 10 * 10;
@@ -83,7 +89,6 @@ void GetDistace0(Soldier* my_bot, Line *line, list<Bullet*>  bullets, list<Soldi
 
         s1 = 0; yyy = 0;
         line->rect.top = Bot_y; line->rect.left = Bot_x;
-//printf("B 2\n");
         while (!yyy) {
             for (Bbot = Bots.begin(); Bbot != Bots.end(); Bbot++){
                 if ((*line).rect.intersects((*Bbot)->rect) && (*Bbot)->life && ((*line).owner !=  (*Bbot))) {yyy = 1; break;}
@@ -179,7 +184,8 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
     text2.setString("Max_age");   text2.setPosition(700, 895 );
 
     //÷èòàþ êàðòó
-    ifstream f_map("Map_war.txt");
+    ifstream f_map("Map_war_withot_walls.txt");
+    printf("AAAAAAAAAAAAAAAA\n\n\n");
     for (int i = 0; i < H; i++) {
         std::string str;
         std::getline(f_map, str);
@@ -216,6 +222,7 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
     std::list<Entity*>::iterator it1;
     std::list<Soldier*>::iterator Bbot;
     std::list<Soldier*>::iterator Bbot1;
+    std::list<Soldier*>::iterator Bbot2;
     std::list<Bullet*>::iterator bul;
     std::list<Bullet*>::iterator bul1;
     Line line(t);
@@ -235,6 +242,7 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
 //âñÿêèå ìèíóñû ïîñòàâëåíû äëÿ òîãî, ÷òîáû èãðîê ðîæäàëñÿ íå â ñòåíêàõ êàðòû
         Bots_life.push_back(new Soldier(t, rand()%(W - 2) + 1, rand()%(H - 2) + 1, inputs, mids, outs));
     }
+    Bbot2 = Bots_life.begin();
 
 //printf("A  6\n");
 
@@ -250,14 +258,13 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
 
 
 //each static_update updates we will update best-killer and long-liver
-    int static_update = 100; int update_time = 0;
+    int static_update = 500; int update_time = 0;
     int best_age = 0; int best_kills = 0;
 
 
     while (window.isOpen()){
-//printf("A\n");
 
-//printf("\n\n\nNEW\n");
+//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNEW\n");
         float time = clock.getElapsedTime().asMicroseconds();
         time = time / 500; //äàòü ïðîøåäøåå âðåìÿ.
         if (time > 20) time = 20;
@@ -297,7 +304,7 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
             if (!(*Bbot)->life || (*Bbot)->lives <= 0) {
                 (*Bbot)->rect.left = float((rand() % (W-2) + 1) * 16);
                 (*Bbot)->rect.top  = float((rand() % (H-2) + 1) * 16);
-                (*Bbot)->life = true; (*Bbot)->lives = 1; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0;
+                (*Bbot)->life = true; (*Bbot)->lives = 3; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0;
                 bGetKohonet(*Bbot, *Bbot, 1);
             }
             if ((*Bbot)->control()) { bullets.push_back(new Bullet((*Bbot)->rect.left, (*Bbot)->rect.top, t, speed_bul*cos((*Bbot)->da), speed_bul*sin((*Bbot)->da), *Bbot));}
@@ -322,8 +329,11 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
         for (bul = bullets.begin(); bul != bullets.end();){
 			Bullet *b = *bul;//äëÿ óäîáñòâà, ÷òîáû íå ïèñàòü (*it)->
 			b->update(time);//âûçûâàåì ô-öèþ update äëÿ âñåõ îáúåêòîâ (ïî ñóòè äëÿ òåõ, êòî æèâ)
-			if (b->life == false)	{ bul = bullets.erase(bul); delete b; }// åñëè ýòîò îáúåêò ìåðòâ, òî óäàëÿåì åãî
-			else bul++;//è èäåì êóðñîðîì (èòåðàòîðîì) ê ñëåä îáúåêòó. òàê äåëàåì ñî âñåìè îáúåêòàìè ñïèñêà
+			if (b->life == false)	{
+                if ((*bul)->owner != NULL) {(*bul)->owner->lives--;}
+                bul = bullets.erase(bul); delete b;
+            }
+            else bul++;//è èäåì êóðñîðîì (èòåðàòîðîì) ê ñëåä îáúåêòó. òàê äåëàåì ñî âñåìè îáúåêòàìè ñïèñêà
 		}
 
 
@@ -341,16 +351,16 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
         for (bul1 = bullets.begin(); bul1 != bullets.end(); bul1++){
             for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
                 if ((*bul1)->rect.intersects((*Bbot)->rect) && (*bul1)->life && (*Bbot)->life && ((*bul1)->owner != (*Bbot))) {
-                    (*Bbot)->lives -= 2;
+                    (*Bbot)->lives -= 1;
                     if ((*Bbot)->lives <= 0) {
-                        (*Bbot)->lives = 1; (*Bbot)->life = true; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0;
+                        (*Bbot)->lives = 3; (*Bbot)->life = true; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0;
                         if ((*bul1)->owner != NULL) {
                             bGetKohonet(*Bbot, (*bul1)->owner, 1);
-                            (*bul1)->owner->lives++; (*bul1)->owner->age_without_killing = 0; (*bul1)->owner->kills++;
+                            (*bul1)->owner->lives += 2; (*bul1)->owner->age_without_killing = 0; (*bul1)->owner->kills += 1;
                         } else {bGetKohonet(*Bbot, *Bbot, 1);}
                         (*Bbot)->rect.left = float((rand() % (W-2) + 1) * 16);
                         (*Bbot)->rect.top  = float((rand() % (H-2) + 1) * 16);
-                    }
+                    } else if ((*bul1)->owner != NULL) { (*bul1)->owner->lives += 1; }
                 (*bul1)->life = false;
                 }
             }
@@ -370,13 +380,15 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
 
         update_time++;
         if (update_time > static_update) {
+            (*Bbot2)->sprite.setTextureRect(IntRect(5*16, 9*16, 16, 16));
             best_age = 0; best_kills = 0; update_time = 0;
             for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
-                if ((*Bbot)->age >  best_age) { best_age = (*Bbot)->age; }
+                if ((*Bbot)->age >  best_age) { best_age = (*Bbot)->age; Bbot2 = Bbot; }
                 if ((*Bbot)->kills > best_kills) {best_kills = (*Bbot)->kills;}
             }
             text1.setString(std::to_string(best_kills));
             text3.setString(std::to_string(best_age));
+            (*Bbot2)->sprite.setTextureRect(IntRect(7*16, 9*16, 16, 16));
         }
 
 

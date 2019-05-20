@@ -1,4 +1,5 @@
-#include "Player.cpp"
+//#include "Player.cpp"
+#include "Player_without_walls.cpp"
 
 
 using namespace sf;
@@ -21,7 +22,7 @@ public:
         else {space1 = false;}
 
         unsigned int lll = clock();
-//while (clock() - lll < 10000) {}
+while (clock() - lll < 20000) {}
         dx = dsp*cos(da); dy = dsp*sin(da); dsp = 0;
 
         return space1;

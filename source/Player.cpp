@@ -38,7 +38,7 @@ public:
     }
 
 // возвращает true, есл произошло столкновение со стеной..
-    bool update(float time) {
+    virtual bool update(float time) {
         int result = 0;
         rect.left += dx * time / 10;
         result += Collision(1);

@@ -11,16 +11,17 @@
 
 #include <iostream>
 
-#include "Player.cpp"
 #include "Entity.cpp"
 #include "Bullet.cpp"
 #include "Enemy.cpp"
 #include "Lines.cpp"
 #include "Dijkstra.cpp"
 #include "Person.cpp"
-#include "Bot_war_soldier.cpp"
+#include "Bot_war_soldier_without_walls.cpp"
+//#include "Bot_war_soldier.cpp"
 #include "Bot_stupid_runner.cpp"
-#include "Player.cpp"
+//#include "Player.cpp"
+#include "Player_without_walls.cpp"
 #include "Neuron_Net.cpp"
 
 

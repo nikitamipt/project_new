@@ -1,7 +1,8 @@
 #pragma once
 
 
-#include "Player.cpp"
+//#include "Player.cpp"
+#include "Player_without_walls.cpp"
 //#include "Neuron_Net.cpp"
 
 using namespace sf;

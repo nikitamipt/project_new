@@ -8,7 +8,9 @@ using std::stringstream;
 #include <iostream>
 
 #include "Neuron.cpp"
-#include "Bot_war_soldier.cpp"
+#include "Bot_war_soldier_without_walls.cpp"
+
+//#include "Bot_war_soldier.cpp"
 
 
 /*
