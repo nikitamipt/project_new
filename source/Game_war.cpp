@@ -101,8 +101,8 @@ void GetDistace0(Soldier_without_walls/*Soldier*/* my_bot, Line *line, list<Bull
 
 // THIS FUNCTION SHOULD BE DECLARES IN  "NEURON_NET.cpp" BUT it has problems there as two classes reference each other at the same time
 void bGetKohonet(Soldier_without_walls/*Soldier*/* my_bot, Soldier_without_walls/*Soldier*/* Bot, int rnd) {
-    int inputs = Bot->Net.inputs; int mids = Bot->Net.mids; int outs = Bot->Net.outs;
-
+   /* int inputs = Bot->Net.inputs; int mids = Bot->Net.mids; int outs = Bot->Net.outs;
+    if (Bot == NULL) {Bot = my_bot;}
     int q = 0;
     for (int i = 0; i < mids; i++) {
         for (int j = 0; j < inputs; j++) {
@@ -121,10 +121,13 @@ void bGetKohonet(Soldier_without_walls/*Soldier*/* my_bot, Soldier_without_walls
             my_bot->Net.outNeurons[j]->weights[i] = rrr;
             q++;
         }
-    }
+    }*/
 }
 
-
+void random_rect(Player* pl) {
+    (*pl).rect.left = float((rand() % (W-2) + 1) * 16);
+    (*pl).rect.top  = float((rand() % (H-2) + 1) * 16);
+}
 
 void Game_war() {
 int yyy = 0;
@@ -136,7 +139,7 @@ int yyy = 0;
 bool visual = true;
 bool who = true; //\F0\E5\F9\E0\E5\F2, \E1\F3\E4\E5\F2 \EB\E8 \F2\F3\F2 \F0\F3\F7\ED\EE\E5 \F3\EF\F0\E0\E2\EB\E5\ED\E8\E5 \E8\EB\E8 \ED\E5\F2.
 const int num_of_bots = 10;
-int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of the bots.
+int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of the bots.
 
 
 //printf("A  2\n");
@@ -290,13 +293,14 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
 //çäåñü ÿ óïðàâëÿåò áîò! NO_HUMAN!
         bool qqq = false;//ïðîâåðÿþ, åñòü ëè åùå æèâûå áîòû
         for (Bbot = Bots_life.begin(); Bbot != Bots_life.end();Bbot++){
-          //  GetDistace0(*Bbot, &line, bullets, Bots_life, &p);
             if (!(*Bbot)->life || (*Bbot)->lives <= 0) {
-                (*Bbot)->rect.left = float((rand() % (W-2) + 1) * 16);
-                (*Bbot)->rect.top  = float((rand() % (H-2) + 1) * 16);
-                (*Bbot)->life = true; (*Bbot)->lives = 3; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0;
-                bGetKohonet(*Bbot, *Bbot, 1);
+                random_rect(*Bbot);
+                (*Bbot)->life = true; (*Bbot)->lives = 3; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0; (*Bbot)->killer = NULL;
+                bGetKohonet(*Bbot, (*Bbot)->killer, 1);
             }
+
+            GetDistace0(*Bbot, &line, bullets, Bots_life, &p);
+
             if ((*Bbot)->control()) { bullets.push_back(new Bullet((*Bbot)->rect.left, (*Bbot)->rect.top, t, speed_bul*cos((*Bbot)->da), speed_bul*sin((*Bbot)->da), *Bbot));}
             (*Bbot)->life = ((*Bbot)->update(time)); //áîò óìèðàåò, êàê òîëüêî ñòîëêíóëñÿ ñî ñòåíîé
         }
@@ -343,29 +347,30 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
                 if ((*bul1)->rect.intersects((*Bbot)->rect) && (*bul1)->life && (*Bbot)->life && ((*bul1)->owner != (*Bbot))) {
                     (*Bbot)->lives -= 1;
                     if ((*Bbot)->lives <= 0) {
-                        (*Bbot)->lives = 3; (*Bbot)->life = true; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0;
-                        if ((*bul1)->owner != NULL) {
-                            bGetKohonet(*Bbot, (*bul1)->owner, 1);
-                            (*bul1)->owner->lives += 2; (*bul1)->owner->age_without_killing = 0; (*bul1)->owner->kills += 1;
-                        } else {bGetKohonet(*Bbot, *Bbot, 1);}
-                        (*Bbot)->rect.left = float((rand() % (W-2) + 1) * 16);
-                        (*Bbot)->rect.top  = float((rand() % (H-2) + 1) * 16);
-                    } else if ((*bul1)->owner != NULL) { (*bul1)->owner->lives += 1; }
-                (*bul1)->life = false;
+                        (*Bbot)->life = false;
+                        if ((*bul1)->owner != NULL) {(*Bbot)->killer = (*bul1)->owner;}
+                        else                        {(*Bbot)->killer = *Bbot;}
+                    }
+                    if ((*bul1)->owner != NULL) {
+                        (*bul1)->owner->lives += 2;
+                        (*bul1)->owner->age_without_killing = 0;
+                        (*bul1)->owner->kills += 1;
+                    }
+                    (*bul1)->life = false;
                 }
             }
 		}
 
-/*// srolknoveniye BOT + BOT
+// srolknoveniye BOT + BOT
         for (Bbot1 = Bots_life.begin(); Bbot1 != Bots_life.end(); Bbot1++){
             for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
                 if ((*Bbot1)->rect.intersects((*Bbot)->rect) && (*Bbot1)->life && (*Bbot)->life && Bbot != Bbot1) {
-                    (*Bbot)->life = false;
-                    (*Bbot1)->life = false;
+           //         (*Bbot)->lives--;   random_rect(*Bbot);
+           //         (*Bbot1)->lives--;  random_rect(*Bbot1);
                 }
             }
 		}
-*/
+
 //printf("C398\n");
 
         update_time++;
@@ -379,6 +384,8 @@ int inputs =  11; int outs = 2; int mids = 6; // number of neurons in the net of
             text1.setString(std::to_string(best_kills));
             text3.setString(std::to_string(best_age));
             (*Bbot2)->sprite.setTextureRect(IntRect(7*16, 9*16, 16, 16));
+            (*Bbot)->Net.fSaveKohonet(f_net_out);
+
         }
 
 

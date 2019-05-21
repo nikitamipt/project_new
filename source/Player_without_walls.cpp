@@ -20,7 +20,7 @@ class Player : public Entity {
 public:
     float dsp;  //будет ли он двигаться или нет?
     float da;   //угол относительно Ox
-    unsigned int last_shot; //показывает время, когда в последний раз стрельнул персонаж.
+    int last_shot; // less than 1 shot in 20 days..
 
     bool onGround; // на замеле ли мы находимся?
     float currentFrame; // екущее положение анимации

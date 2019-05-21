@@ -15,7 +15,7 @@ public:
     int kills;// kill-score bot. Just for statics.
     int age;  // just for static;
     int age_without_killing; //just for static. Each 1000? updates without kills - minus live..
-    Soldier* killer; //bot that killed this one
+    Soldier_without_walls* killer; //bot that killed this one
     KohonenNet Net;
     //next 2 characteristics you can delete, they are not needed
     int dist_to_finish;
@@ -30,7 +30,7 @@ public:
         sprite.setTextureRect(IntRect(5*16, 9*16, 16, 16));
         dx = 0; dy = 0; da = 0;
         currentFrame = 0;
-        kills = 0; lives = 3; age = 0; age_without_killing = 0;
+        kills = 0; lives = 3; age = 0; age_without_killing = 0; last_shot = 0; killer = NULL;
         space = false;
         dsp = 1; da = 0;
         life = true;
@@ -40,16 +40,16 @@ public:
 
 
     bool control() {
-        age++; age_without_killing++;
-        if (age_without_killing > 200) {lives--;}
-        Net.inNeurons[10]->value = float(clock() - last_shot);
+        age++; age_without_killing++; last_shot++;
+        if (age_without_killing > 500) {lives--;}
+        Net.inNeurons[5]->value = float(last_shot);
         float fight = Net.outNeurons[1]->kernelFunction();
-        float da1 = float(Net.outNeurons[0]->kernelFunction())/100000000;
+        float da1 = float(Net.outNeurons[0]->kernelFunction())/100000;
 //sprintf("da1 = %f\n\n", da1);
         if (da1 < -3.1415/2){da1 = -3.1415/2;} if (da1 > 3.1415/2) {da1 = 3.1415/2;}
         da += da1; dx = dsp*cos(da); dy = dsp*sin(da);
-        if (clock() - last_shot > 500000 && fight > 4000000) { //ïåðåçàäðÿäêà 1000ìèëèñåê
-            last_shot = clock();
+        if (last_shot > 50 && fight > 4000) { //ïåðåçàäðÿäêà 1000ìèëèñåê
+            last_shot = 0;
             return true;
         }
         return false;
