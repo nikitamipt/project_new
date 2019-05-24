@@ -20,9 +20,9 @@ public:
     }
 
     void update(float time) {
-        rect.left += (dx * 8); rect.top  += (dy * 8);
+        rect.left += dx; rect.top  += dy;
         if (rect.left < 0) {rect.left += (16 * W);} else if (rect.left >= (16 * W)) {rect.left -= (16 * W);}
-        if (rect.top  < 0) {rect.top  += (16 * H);} else if (rect.top  >= (16 * H)) {rect.left -= (16 * H);}
+        if (rect.top  < 0) {rect.top  += (16 * H);} else if (rect.top  >= (16 * H)) {rect.top  -= (16 * H);}
         sprite.setPosition(rect.left, rect.top ); // координаты x, y
     }
 

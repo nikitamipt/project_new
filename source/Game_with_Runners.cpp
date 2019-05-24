@@ -57,7 +57,7 @@ int inputs =  5; int mids = 3; int outs = 1; // number of neurons in the net of 
     RenderWindow window(VideoMode(960, 960), "SFML works!");
 
     Texture t;
-    t.loadFromFile("1.png");
+    t.loadFromFile("2.png");
     Sprite tile(t);
 
      // \EA\F3\E4\E0 \FF \F1\EE\F5\F0\E0\ED\FF\FE \ED\E0\F8\F3 \F1\E5\F2\EA\F3. \EE\F2\EA\F3\E4\E0
@@ -133,7 +133,7 @@ int inputs =  5; int mids = 3; int outs = 1; // number of neurons in the net of 
             qqq = true;
             Runner *b = *Bbot;//\E4\EB\FF \F3\E4\EE\E1\F1\F2\E2\E0, \F7\F2\EE\E1\FB \ED\E5 \EF\E8\F1\E0\F2\FC (*it)->
             b->control();
-            b->life = (b->update(time)); //\E1\EE\F2 \F3\EC\E8\F0\E0\E5\F2, \EA\E0\EA \F2\EE\EB\FC\EA\EE \F1\F2\EE\EB\EA\ED\F3\EB\F1\FF \F1\EE \F1\F2\E5\ED\EE\E9
+            b->life = (b->update_walls(time)); //\E1\EE\F2 \F3\EC\E8\F0\E0\E5\F2, \EA\E0\EA \F2\EE\EB\FC\EA\EE \F1\F2\EE\EB\EA\ED\F3\EB\F1\FF \F1\EE \F1\F2\E5\ED\EE\E9
         //\E5\F1\EB\E8 \E1\EE\F2 \F1\F2\EE\EB\EA\ED\F3\EB\F1\FF \F1\EE \F1\F2\E5\ED\EE\E9, \F2\EE "\F3\E1\E8\E2\E0\E5\EC \E5\E3\EE", \E7\E0\ED\EE\F1\E8\EC \E2 \F1\EF\E8\F1\EE\EA \EC\E5\F0\F2\E2\FB\F5 \E1\EE\F2\EE\E2, \F1\F7\E8\F2\FB\E2\E0\FF \E4\E8\F1\F2\E0\ED\F6\E8\FE \E4\EE \F4\E8\ED\E8\ED\F8\E0.
 
             if ((b->life == false) || (next_generation) || (window_close))	{
@@ -168,7 +168,7 @@ int inputs =  5; int mids = 3; int outs = 1; // number of neurons in the net of 
             bb->Net.mSaveKohonet(mas_weights);
             bb->Net.fSaveKohonet(f_net_out);
            // printf("bb->dist_to_finish = %d  bb->score = %lld\n",  Dijkstra(int((bb->rect.left)/ 16), int((bb->rect.top)/16)), bb->score);
-            bb->Net.rSaveKohonet();
+          //  bb->Net.rSaveKohonet();
 
             int rrr = -2; //\EF\E5\F0\E2\FB\E9 \E3\E5\ED \E1\F3\E4\E5\F2 \E1\E5\E7 \E8\E7\EC\E5\ED\E5\ED\E8\E9. \E2\F1\E5 \EF\EE\F1\EB\E5\E4\F3\FE\F9\E8\E5 \E7\E0\EC\E5\ED\FF\F2\FC\F1\FF
             for (Bbot = Bots_death.begin(); Bbot != Bots_death.end();){
@@ -185,7 +185,6 @@ int inputs =  5; int mids = 3; int outs = 1; // number of neurons in the net of 
 
         //\F7\F2\EE\E1\FB \E7\E0\EF\F3\F1\F2\E8\F2\FC \ED\EE\E2\FB\E9 \F0\EE\E4 (\F3\E1\E8\F2\FC \E2\F1\E5\F5 \E2\F0\E0\F9\E0\FE\F9\E8\F5\F1\FF \ED\E0 \EC\E5\F1\F2\E5)
         if (Keyboard::isKeyPressed(Keyboard::Right)) {
-            //\F7\F2\EE\E1\FB \ED\E5\F1\EA\EE\EB\FC\EA\EE \F0\E0\E7 \EF\EE\E4\F0\FF\E4 \ED\E5 \EF\E5\F0\E5\F0\EE\E6\E4\E0\F2\FC. \CE\F2 \E7\E0\EB\E8\EF\E0\ED\E8\FF \EA\EB\E0\E2\E8\F8\E8
             if (Right_key == false) {
                 Right_key = true;
                 for (Bbot = Bots_life.begin(); Bbot != Bots_life.end();Bbot++){
@@ -193,9 +192,7 @@ int inputs =  5; int mids = 3; int outs = 1; // number of neurons in the net of 
                 }
                 next_generation = true;
             }
-        } else {
-            Right_key = false;
-        }
+        } else { Right_key = false; }
 
 
 

@@ -25,7 +25,7 @@ private:
     vector<vector<char>> mymap; //карта
     int to_x_step, to_y_step; //координаты в точках клетки куда идем.
     int warning_time = 0; // задержка в укрытии
-    int nearest_opponent_x, nearest_opponent_y; //координаты в точках ближайшего противника.
+    int nearest_opponent_x = -1, nearest_opponent_y = -1; //координаты в точках ближайшего противника.
 public:
     int get_perez();
     void update_perez(int t);
@@ -39,5 +39,5 @@ public:
     bool update(float time);
     pair<int,int> fire();
 };
-pair<int, int> nearest_opponent(const vector<DETBot>& opponents, int my_x, int my_y);// возвращает to_x, to_y ближайшего противника
+pair<int, int> nearest_opponent(const vector<DETBot>& opponents,const int my_x,const int my_y);// возвращает to_x, to_y ближайшего противника
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

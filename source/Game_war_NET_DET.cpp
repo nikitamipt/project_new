@@ -18,22 +18,6 @@ git push origin master
 #include <iostream>
 
 #include "Neuron_Net.cpp"
-/*
-#include "Player.сpp"
-#include "Entity.сpp"
-#include "Bullet.сpp"
-#include "Enemy.сpp"
-#include "Lines.cpp"
-#include "Dijkstra.cpp"
-#include "Person.cpp"
-#include "Bot.cpp"
-#include <iostream>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sstream>
-#include <fstream>
-#include <string>
-*/
 
 
 //#include <SFML/Audio.hpp>
@@ -43,13 +27,6 @@ using namespace sf;
 
 
 
-int view_distance = 50; //distance that bot can see
-
-// áóäó ðàñ÷èòûâàòü èç ñîîáðàæåíèé, ÷òî íà îäíîãî áîòà âûõîäèò bot_squre êâ åä ïëîùàäè (íå õàðîìû, íî è íå îáùàãà â Äîëãîïå)
-int bot_squre  = 10 * 10;
-int kol_bot = 2;//(H * W) / bot_squre;
-
-float dist[5] = {3.1415/2, 3.1415/4, 0, -3.1415/4, -3.1415/2};
 
 
 //ATTENTION: NEXT FUNCTION IS THE MOST BIG DERMOKOD IN THIS DERMAKOD-PROGRAMM
@@ -57,98 +34,36 @@ float dist[5] = {3.1415/2, 3.1415/4, 0, -3.1415/4, -3.1415/2};
 // 0 - if the nearest is the WALL
 // 1 - if                    BULLET
 // 2 - if                    BOT
-void GetDistace0(Soldier_without_walls/*Soldier*/* my_bot, Line *line, list<Bullet*>  bullets, list<Soldier_without_walls/*Soldier*/*>  Bots, Person* P) {
-    int Bot_x = my_bot->rect.left; int Bot_y = my_bot->rect.top; float alpha = my_bot->da; (*line).owner = my_bot;
-    std::list<Bullet*>::iterator bul1;
-    std::list<Soldier_without_walls/*Soldier*/*>::iterator Bbot;
-//printf("\nBOT_START\n");
-    for (int i = 0; i < 5; i++) {
-        int x = Bot_x; int y = Bot_y;
-        int s = 0;//distance
-        int k1 = 0;//type of distance.
-//printf("   wall = %d type  = %d\n", s, k1);
 
 
-        int yyy = 0; int s1 = 0;
-        line->rect.top = Bot_y; line->rect.left = Bot_x; line->dx = cos(alpha + dist[i]); line->dy = sin(alpha + dist[i]);
-        while (s1 < view_distance) {
-            for (bul1 = bullets.begin(); bul1 != bullets.end(); bul1++){
-                if ((*line).rect.intersects((*bul1)->rect) &&  (*bul1)->life) {yyy = 1; break;}
-            }
-            s1++;   line->update(0);
-        }
-        if (s1 < view_distance) {s = s1;}
-//printf("   Bul = %d    type = %d\n",  s1, k1);
-
-        s1 = 0; yyy = 0;
-        line->rect.top = Bot_y; line->rect.left = Bot_x;
-        while (s1 < s || s1 >= view_distance) {
-            for (Bbot = Bots.begin(); Bbot != Bots.end(); Bbot++){
-                if ((*line).rect.intersects((*Bbot)->rect) && (*Bbot)->life && ((*line).owner !=  (*Bbot))) {yyy = 1; break;}
-            }
-            if ((*line).rect.intersects((*P).rect) &&  (*P).life) {yyy = 1; break;}
-            s1++; line->update(0);
-        }
-        if (((s != 0) && (s1 < s)) || (s1 < view_distance)) {s = s1;}
-        if (s == 0) {s = 5 * view_distance;}
-//printf("   Bot = %d    type = %d\n",  s1, k1);
-
-        my_bot->Net.inNeurons[i]->value = float(s);
-//printf("dist = %d, type = %d\n", s, k1);
-    }
-}
 
 
-// THIS FUNCTION SHOULD BE DECLARES IN  "NEURON_NET.cpp" BUT it has problems there as two classes reference each other at the same time
-void bGetKohonet(Soldier_without_walls/*Soldier*/* my_bot, Soldier_without_walls/*Soldier*/* Bot, int rnd) {
-   /* int inputs = Bot->Net.inputs; int mids = Bot->Net.mids; int outs = Bot->Net.outs;
-    if (Bot == NULL) {Bot = my_bot;}
-    int q = 0;
-    for (int i = 0; i < mids; i++) {
-        for (int j = 0; j < inputs; j++) {
-            int w = rand()%3;//ñ âåðîÿòíîñòüþ 50% ïðîèñõîäèò çàìåíà ÷èñëà
-            int rrr =  (Bot)->Net.secNeurons[i]->weights[j];
-            if ((w==0) && (rnd > 0)) { rrr = rand()%chislo - chislo/2; }
-            my_bot->Net.secNeurons[i]->weights[j] = rrr;
-            q++;
-        }
-    }
-    for (int j = 0; j < outs; j++) {
-        for (int i = 0; i < mids; i++) {
-            int w = rand()%3;
-            int rrr = (Bot)->Net.outNeurons[j]->weights[i];
-            if ((w == 0) && (rnd > 0)) {rrr = rand()%chislo - chislo/2;}
-            my_bot->Net.outNeurons[j]->weights[i] = rrr;
-            q++;
-        }
-    }*/
-}
-
-void random_rect(Player* pl) {
-    (*pl).rect.left = float((rand() % (W-2) + 1) * 16);
-    (*pl).rect.top  = float((rand() % (H-2) + 1) * 16);
-}
-
-void Game_war() {
+void Game_war_NET_DET() {
 int yyy = 0;
-
-//printf("A  1\n");
-
-
-
+fast_game = false;
 bool visual = true;
 bool who = true; //\F0\E5\F9\E0\E5\F2, \E1\F3\E4\E5\F2 \EB\E8 \F2\F3\F2 \F0\F3\F7\ED\EE\E5 \F3\EF\F0\E0\E2\EB\E5\ED\E8\E5 \E8\EB\E8 \ED\E5\F2.
-const int num_of_bots = 10;
-int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of the bots.
+int inputs =  7; int outs = 2; int mids = 5; // number of neurons in the net of the bots.
+// áóäó ðàñ÷èòûâàòü èç ñîîáðàæåíèé, ÷òî íà îäíîãî áîòà âûõîäèò bot_squre êâ åä ïëîùàäè (íå õàðîìû, íî è íå îáùàãà â Äîëãîïå)
+int bot_squre  = 10 * 20;
+int kol_bot = (H * W) / bot_squre;
 
 
-//printf("A  2\n");
+bool use_old_expirience = true; // if use last net
+
+int lives_for_kill      =  3;
+int lives_for_collision = -1;
+int lives_for_lost_bul  = -3;
+int lives_first         =  3;
+int lives_hurt_bul      = -1;
+int lives_for_bul       =  1;
+
 
 
     RenderWindow window(VideoMode(960, 960), "SFML works!");
 
     Texture t;
-    t.loadFromFile("1.png");
+    t.loadFromFile("2.png");
     Sprite tile(t);
 
      // êóäà ÿ ñîõðàíÿþ íàøó ñåòêó. îòêóäà
@@ -222,14 +137,10 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
 
     Line L(t);  //íóæíî äëÿ ðèñîâàíèÿ ïðèöåëà è íàõîæäíèé ðàññòîÿíèé äî ñòåíîê
     Person p(1);
-    p.Player_maker(t, x_start, y_start);
+    p.Player_maker(t, 2, 2);
 
-
-
-//printf("A  5\n");
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    cout << "H = " << H << " W = " << W << endl;
     int DETBot_x_start = 0; int DETBot_y_start = 0;
     list<Bullet> detbots_bullets;
     vector<DETBot> detbots;
@@ -258,23 +169,36 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
 
 
 
+
+
+
+//printf("A  5\n");
+
+
+
+
     for (int i = 0; i < kol_bot; i++) {
-//âñÿêèå ìèíóñû ïîñòàâëåíû äëÿ òîãî, ÷òîáû èãðîê ðîæäàëñÿ íå â ñòåíêàõ êàðòû
         Bots_life.push_back(new Soldier_without_walls/*Soldier*/(t, rand()%(W - 2) + 1, rand()%(H - 2) + 1, inputs, mids, outs));
+        //Bots_life.push_back(new Soldier_without_walls/*Soldier*/(t, 10, 10 + 10 * i, inputs, mids, outs));
     }
+    for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){ (*Bbot)->killer = (*Bbot);}
+    if (use_old_expirience) {
+        for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
+            (*Bbot)->Net.fGetKohonet(f_net_in);
+          //  (*Bbot)->Net.rSaveKohonet();
+        }
+    }
+
     Bbot2 = Bots_life.begin();
 
-//printf("A  6\n");
-
-
-
-    //Driver Driver(0); // øòóêà, êîòîðàÿ óïðàâëÿåò èãðîêîì!  (äà-äà-äà, ñàìà!)
 
     bool space = false; //êîíòðîëèò, íàæàò ëè SPACE èëè íåò. Íàäî äëÿ ñòðåëüáû, ÷òîáû î÷åðåäè íå áûëî
     bool Right_key = false; //êîíòðîëèò, íàæàò ëè Right èëè íåò. Íàäî äëÿ íîâîé ãåíåðàöèè áîòîâ.
+    bool Left_key  = false;
     Clock clock; // ÷òîáû ñêîðîñòü áûëà ïðèâÿçàíà êî âðåìåíè, à íå ê òàêòîâîé ÷àñòîòå ïðîöåññîðà
 
     bool next_generation = false; //êîãäà true - óáèâàþ âñåõ áîòîâ è ïåðåðîæäàþ ëó÷øèõ!
+
 
 
 //each static_update updates we will update best-killer and long-liver
@@ -284,7 +208,8 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
 
     while (window.isOpen()){
 
-//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNEW\n");
+
+//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNEW\n");
         float time = clock.getElapsedTime().asMicroseconds();
         time = time / 500; //äàòü ïðîøåäøåå âðåìÿ.
         if (time > 20) time = 20;
@@ -322,14 +247,15 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
         for (Bbot = Bots_life.begin(); Bbot != Bots_life.end();Bbot++){
             if (!(*Bbot)->life || (*Bbot)->lives <= 0) {
                 random_rect(*Bbot);
-                (*Bbot)->life = true; (*Bbot)->lives = 3; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0; (*Bbot)->killer = NULL;
-                bGetKohonet(*Bbot, (*Bbot)->killer, 1);
+                (*Bbot)->life = true; (*Bbot)->lives = lives_first; (*Bbot)->age = 0; (*Bbot)->kills = 0; (*Bbot)->age_without_killing = 0;
+                bGetKohonet(*Bbot, (*Bbot)->killer, 1); (*Bbot)->killer = (*Bbot);
             }
 
-            GetDistace0(*Bbot, &line, bullets, Bots_life, &p);
+            GetDistace_full_view(*Bbot, bullets, Bots_life, &p);
 
             if ((*Bbot)->control()) { bullets.push_back(new Bullet((*Bbot)->rect.left, (*Bbot)->rect.top, t, speed_bul*cos((*Bbot)->da), speed_bul*sin((*Bbot)->da), *Bbot));}
-            (*Bbot)->life = ((*Bbot)->update(time)); //áîò óìèðàåò, êàê òîëüêî ñòîëêíóëñÿ ñî ñòåíîé
+            (*Bbot)->update(time); //áîò óìèðàåò, êàê òîëüêî ñòîëêíóëñÿ ñî ñòåíîé
+
         }
 
         //÷òîáû çàïóñòèòü íîâûé ðîä (óáèòü âñåõ âðàùàþùèõñÿ íà ìåñòå)
@@ -338,9 +264,11 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
                 Right_key = true;
                 for (Bbot = Bots_life.begin(); Bbot != Bots_life.end();Bbot++){ (*Bbot)->life = false; }
             }
-        } else {
-            Right_key = false;
-        }
+        } else { Right_key = false; }
+
+        if (Keyboard::isKeyPressed(Keyboard::Left)) {
+            if (!Left_key) { fast_game ? fast_game = false : fast_game = true;  Left_key = true;}
+        } else Left_key = false;
 
 
 
@@ -351,59 +279,23 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
 			Bullet *b = *bul;//äëÿ óäîáñòâà, ÷òîáû íå ïèñàòü (*it)->
 			b->update(time);//âûçûâàåì ô-öèþ update äëÿ âñåõ îáúåêòîâ (ïî ñóòè äëÿ òåõ, êòî æèâ)
 			if (b->life == false)	{
-                if ((*bul)->owner != NULL) {(*bul)->owner->lives--;}
+                if ((*bul)->owner != NULL) {(*bul)->owner->lives += lives_for_lost_bul;}
                 bul = bullets.erase(bul); delete b;
             }
             else bul++;//è èäåì êóðñîðîì (èòåðàòîðîì) ê ñëåä îáúåêòó. òàê äåëàåì ñî âñåìè îáúåêòàìè ñïèñêà
 		}
 
 
-//çäåñü ïðîèñçîäò îáðàáîòêà ïóëü. Ïóëÿ â ïóëþ - äâó ïóëè ïîãèáàþò. Ïóëÿ â áîòà - îáà ïîìèðàþò, ê õîçÿèíó ïóëè äîáàâëÿåòñÿ îäíî î÷êî
-//stolknovenie PULA + PULA
-        for (bul = bullets.begin(); bul != bullets.end(); bul++){
-            for (bul1 = bullets.begin(); bul1 != bullets.end(); bul1++){
-                if (bul1 != bul && (*bul)->rect.intersects((*bul1)->rect) && (*bul)->life && (*bul1)->life) {
-                    (*bul)->life = false; (*bul1)->life = false;
-                }
-            }
-		}
-
-// stolknovenie PULA + BOT
-        for (bul1 = bullets.begin(); bul1 != bullets.end(); bul1++){
-            for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
-                if ((*bul1)->rect.intersects((*Bbot)->rect) && (*bul1)->life && (*Bbot)->life && ((*bul1)->owner != (*Bbot))) {
-                    (*Bbot)->lives -= 1;
-                    if ((*Bbot)->lives <= 0) {
-                        (*Bbot)->life = false;
-                        if ((*bul1)->owner != NULL) {(*Bbot)->killer = (*bul1)->owner;}
-                        else                        {(*Bbot)->killer = *Bbot;}
-                    }
-                    if ((*bul1)->owner != NULL) {
-                        (*bul1)->owner->lives += 2;
-                        (*bul1)->owner->age_without_killing = 0;
-                        (*bul1)->owner->kills += 1;
-                    }
-                    (*bul1)->life = false;
-                }
-            }
-		}
-
-// srolknoveniye BOT + BOT
-        for (Bbot1 = Bots_life.begin(); Bbot1 != Bots_life.end(); Bbot1++){
-            for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
-                if ((*Bbot1)->rect.intersects((*Bbot)->rect) && (*Bbot1)->life && (*Bbot)->life && Bbot != Bbot1) {
-           //         (*Bbot)->lives--;   random_rect(*Bbot);
-           //         (*Bbot1)->lives--;  random_rect(*Bbot1);
-                }
-            }
-		}
-
-//printf("C398\n");
-
-
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //cout << "========================================" << endl;
+        vector<Soldier_without_walls> opponents;
+
+        for(const auto& i : Bots_life)
+        {
+            opponents.push_back(*i);
+        }
+
         for(auto& i : detbots)
         {
             //cout << "dx = " << i.dx << "dy = " << i.dy << endl;
@@ -424,17 +316,17 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
 
             vector<Bullet> nearest_bullets;
 
-            for(const auto& b : detbots_bullets)
+            for(const auto& b : bullets)
             {
-                long long int length = (b.rect.left - i.rect.left)*(b.rect.left - i.rect.left) + (b.rect.top - i.rect.top)*(b.rect.top - i.rect.top);
-                if(length <= 2304 && b.owner_DETBot != i.get_id())
+                long long int length = ((*b).rect.left - i.rect.left)*((*b).rect.left - i.rect.left) + ((*b).rect.top - i.rect.top)*((*b).rect.top - i.rect.top);
+                if(length <= 2304 && (*b).owner_DETBot != i.get_id())
                 {
-                    Bullet new_bullet = b;
+                    Bullet new_bullet = *b;
                     nearest_bullets.push_back(new_bullet);
                 }
             }
 
-            i.control(detbots, nearest_bullets);
+            i.control(opponents, nearest_bullets);
             i.update(time);
         }
         //cout << "========================================" << endl;
@@ -489,9 +381,52 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
 
 
 
+//çäåñü ïðîèñçîäò îáðàáîòêà ïóëü. Ïóëÿ â ïóëþ - äâó ïóëè ïîãèáàþò. Ïóëÿ â áîòà - îáà ïîìèðàþò, ê õîçÿèíó ïóëè äîáàâëÿåòñÿ îäíî î÷êî
+//stolknovenie PULA + PULA
+        for (bul = bullets.begin(); bul != bullets.end(); bul++){
+            for (bul1 = bullets.begin(); bul1 != bullets.end(); bul1++){
+                if (bul1 != bul && (*bul)->rect.intersects((*bul1)->rect) && (*bul)->life && (*bul1)->life) {
+                    (*bul)->life = false; (*bul1)->life = false;
+                    if ((*bul)->owner  != NULL) {(*bul)->owner->lives  += lives_for_bul;}
+                    if ((*bul1)->owner != NULL) {(*bul1)->owner->lives += lives_for_bul;}
+                }
+            }
+		}
+
+// stolknovenie PULA + BOT
+        for (bul1 = bullets.begin(); bul1 != bullets.end(); bul1++){
+            for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
+                if ((*bul1)->rect.intersects((*Bbot)->rect) && (*bul1)->life && (*Bbot)->life && ((*bul1)->owner != (*Bbot))) {
+                    (*Bbot)->lives -= lives_for_lost_bul;
+                    if ((*Bbot)->lives <= 0) {
+                        (*Bbot)->life = false;
+                        if ((*bul1)->owner != NULL) {(*Bbot)->killer = (*bul1)->owner;}
+                    }
+                    if ((*bul1)->owner != NULL) {
+                        (*bul1)->owner->lives += lives_for_kill;
+                        (*bul1)->owner->age_without_killing = 0;
+                        (*bul1)->owner->kills += 1;
+                    }
+                    (*bul1)->life = false;
+                }
+            }
+		}
+
+// srolknoveniye BOT + BOT
+        for (Bbot1 = Bots_life.begin(); Bbot1 != Bots_life.end(); Bbot1++){
+            for (Bbot = Bots_life.begin(); Bbot != Bots_life.end(); Bbot++){
+                if ((*Bbot1)->rect.intersects((*Bbot)->rect) && (*Bbot1)->life && (*Bbot)->life && Bbot != Bbot1) {
+                    (*Bbot)->lives += lives_for_collision;  (*Bbot1)->lives += lives_for_collision;
+                }
+            }
+		}
 
 
 
+
+
+
+//printf("C398\n");
 
         update_time++;
         if (update_time > static_update) {
@@ -504,7 +439,7 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
             text1.setString(std::to_string(best_kills));
             text3.setString(std::to_string(best_age));
             (*Bbot2)->sprite.setTextureRect(IntRect(7*16, 9*16, 16, 16));
-           // (*Bbot)->Net.fSaveKohonet(f_net_out);
+            (*Bbot2)->Net.fSaveKohonet(f_net_out);
 
         }
 
@@ -526,7 +461,9 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
     //printf("C420\n");
 
             //ðèñóþ ïðèöåë
-            if(who) {L.rect.left = p.rect.left; L.rect.top = p.rect.top + 4; int s = 0; L.dx = cos(p.da); L.dy = sin(p.da);
+
+
+            if(who) {L.rect.left = p.rect.left; L.rect.top = p.rect.top + 4; int s = 0; L.dx = 8*cos(p.da); L.dy = 8*sin(p.da);
                 while (s < view_distance) {
                     L.update(0); s++; window.draw(L.sprite);
                 }
@@ -541,14 +478,15 @@ int inputs =  6; int outs = 2; int mids = 4; // number of neurons in the net of 
 
 
 
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        for(auto& i : detbots)
-        {
-            window.draw(i.sprite);
-        }
-        for (it_DETBot_bullets = detbots_bullets.begin(); it_DETBot_bullets != detbots_bullets.end(); it_DETBot_bullets++){ window.draw((*it_DETBot_bullets).sprite);}
-        //window.draw(I.sprite);
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            for(auto& i : detbots)
+            {
+                window.draw(i.sprite);
+            }
+            for (it_DETBot_bullets = detbots_bullets.begin(); it_DETBot_bullets != detbots_bullets.end(); it_DETBot_bullets++){ window.draw((*it_DETBot_bullets).sprite);}
+            //window.draw(I.sprite);
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 

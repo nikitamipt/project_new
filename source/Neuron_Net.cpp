@@ -23,6 +23,7 @@ int chislo = 10; //максимальный коэффициент весов
 using namespace std;
 
 
+
 class Player;
 class Soldier;
 class KohonenNet{
@@ -110,10 +111,10 @@ public:
     void mSaveKohonet(int* mas) {
         int q = 0;
         for (int i = 0; i < mids; i++) {
-            for (int j = 0; j < inputs; j++) {mas[q] = secNeurons[i]->weights[j]; q++;}
+            for (int j = 0; j < inputs; j++)    {mas[q] = secNeurons[i]->weights[j]; q++;}
         }
         for (int j = 0; j < outs; j++) {
-            for (int i = 0; i < mids; i++) {mas[q] = outNeurons[j]->weights[i]; q++;}
+            for (int i = 0; i < mids; i++)      {mas[q] = outNeurons[j]->weights[i]; q++;}
         }
     }
 
@@ -131,6 +132,7 @@ public:
                // fin >> std::fixed >> std :: setprecision ( 5 ) >>  outNeurons[j]->weights[j] >> " ";
             }
         }
+        printf("\n");
     }
 
 

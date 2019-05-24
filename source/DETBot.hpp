@@ -17,7 +17,7 @@ DETBot::DETBot(Texture &image, int x_start, int y_start, int id)
     mymap.resize(H);
     for(auto& i : mymap) {i.resize(H);}
 
-    ifstream f_map("map1.txt");
+    ifstream f_map("Map_war_withot_walls.txt");
     for (int i = 0; i < H; i++)
     {
         for(int j = 0; j < H; j++)
@@ -31,6 +31,7 @@ int DETBot::get_perez()
 {
     return perezarydka;
 }
+
 void DETBot::update_perez(int t)
 {
     perezarydka = t;
@@ -40,6 +41,7 @@ int DETBot::get_id()
 {
     return bot_id;
 }
+
 void DETBot::Print_mymap()
 {
     for(const auto& i : mymap)
@@ -132,8 +134,10 @@ void DETBot::Go(Steps step)
         dx = 0;
         dy = 0;
     }
-    to_x_step = rect.left + dx * 16;
-    to_y_step = rect.top  + dy * 16;
+    to_x_step = (static_cast<int>(rect.left + dx * 16))%(60*16);
+    if(to_x_step < 0) to_x_step += 60*16;
+    to_y_step = (static_cast<int>(rect.top  + dy * 16))%(60*16);
+    if(to_y_step < 0) to_y_step += 60*16;
 }
 
 
@@ -146,16 +150,30 @@ bool DETBot::control(int to_x, int to_y)
 bool DETBot::control(const vector<DETBot>& opponents, const vector<Bullet>& bullets)
 {
     if(opponents.size() == 1) return 0;
-    pair<int,int> to = nearest_opponent(opponents, rect.left, rect.top);
+//cout << "to_x_step = " << to_x_step << "to_y_step = " << to_y_step << endl;
+    pair<int,int> to = nearest_opponent(opponents, (int)rect.left, (int)rect.top);
     int to_x = to.first;
     int to_y = to.second;
     nearest_opponent_x = to_x;
     nearest_opponent_y = to_y;
     condition_upd(to_x, to_y, bullets);
+    perezarydka++;
     return true;
 }
 
 bool DETBot::update(float time) {
+
+    int result = 0;
+    rect.left += (dx * time / 10); rect.top  += (dy * time / 10);
+    if (rect.left < 0) {rect.left += (16 * W);} else if (rect.left >= (16 * W)) {rect.left -= (16 * W);}
+    if (rect.top  < 0) {rect.top  += (16 * H);} else if (rect.top  >= (16 * H)) {rect.top  -= (16 * H);}
+    sprite.setPosition(rect.left, rect.top );
+
+
+
+
+
+/*
     int result = 0;
     rect.left += dx * time / 10;
     //result += Collision(1);
@@ -164,6 +182,7 @@ bool DETBot::update(float time) {
     sprite.setPosition(rect.left, rect.top ); // координаты x, y
 
     if (result) return false;
+   */
     return true;
 }
 
@@ -184,47 +203,126 @@ pair<int, int> DETBot::fire()
 
 using namespace std;
 
-pair<int, int> nearest_opponent(const vector<DETBot>& opponents, int my_x, int my_y)// возвращает to_x, to_y ближайшего противника
+pair<int, int> nearest_opponent(const vector<DETBot>& opponents,const int my_x,const int my_y)// возвращает to_x, to_y ближайшего противника
 {
     //cout << "nearest_opponent(my_x = " << my_x << ")" << endl;
+    //cout << " = " << my_x/16 << " = " << my_y/16;
     int res_to_x;
     int res_to_y;
     long long int min_length = 1000000000;
     for(const auto& i : opponents)
     {
         if((my_x == i.rect.left) && (my_y == i.rect.top)) continue; // себ€ не рассматриваем в векторе противников//////////////////////////////////”Ѕ–ј“№**”Ѕ–ј“№**”Ѕ–ј“№
-        long long int length = (i.rect.left - my_x)*(i.rect.left - my_x) + (i.rect.top - my_y)*(i.rect.top - my_y);
+
+        long long int length00 = (i.rect.left-60*16 - my_x)*(i.rect.left-60*16 - my_x) + (i.rect.top-60*16 - my_y)*(i.rect.top-60*16 - my_y);
+        long long int length01 = (i.rect.left - my_x)*(i.rect.left - my_x)             + (i.rect.top-60*16 - my_y)*(i.rect.top-60*16 - my_y);
+        long long int length02 = (i.rect.left+60*16 - my_x)*(i.rect.left+60*16 - my_x) + (i.rect.top-60*16 - my_y)*(i.rect.top-60*16 - my_y);
+
+        long long int length10 = (i.rect.left-60*16 - my_x)*(i.rect.left-60*16 - my_x) + (i.rect.top - my_y)*(i.rect.top - my_y);
+        long long int length11 = (i.rect.left - my_x)*(i.rect.left - my_x)             + (i.rect.top - my_y)*(i.rect.top - my_y);
+        long long int length12 = (i.rect.left+60*16 - my_x)*(i.rect.left+60*16 - my_x) + (i.rect.top - my_y)*(i.rect.top - my_y);
+
+        long long int length20 = (i.rect.left-60*16 - my_x)*(i.rect.left-60*16 - my_x) + (i.rect.top+60*16 - my_y)*(i.rect.top+60*16 - my_y);
+        long long int length21 = (i.rect.left - my_x)*(i.rect.left - my_x)             + (i.rect.top+60*16 - my_y)*(i.rect.top+60*16 - my_y);
+        long long int length22 = (i.rect.left+60*16 - my_x)*(i.rect.left+60*16 - my_x) + (i.rect.top+60*16 - my_y)*(i.rect.top+60*16 - my_y);
+
+        vector<long long int> length_v(9);
+        length_v[0] = length00;
+        length_v[1] = length01;
+        length_v[2] = length02;
+        length_v[3] = length10;
+        length_v[4] = length11;
+        length_v[5] = length12;
+        length_v[6] = length20;
+        length_v[7] = length21;
+        length_v[8] = length22;
+
+        sort(length_v.begin(), length_v.end());
+        long long int length = length_v[0];
+
         if(length < min_length)
         {
             min_length = length;
-            res_to_x = i.rect.left;
-            res_to_y = i.rect.top;
+            if(length == length00)
+            {
+                res_to_x = i.rect.left - 60*16;
+                res_to_y = i.rect.top  - 60*16;
+            }
+            else if(length == length01)
+            {
+                res_to_x = i.rect.left;
+                res_to_y = i.rect.top  - 60*16;
+            }
+            else if(length == length02)
+            {
+                res_to_x = i.rect.left + 60*16;
+                res_to_y = i.rect.top  - 60*16;
+            }
+
+
+            else if(length == length10)
+            {
+                res_to_x = i.rect.left - 60*16;
+                res_to_y = i.rect.top;
+            }
+            else if(length == length11)
+            {
+                res_to_x = i.rect.left;
+                res_to_y = i.rect.top;
+            }
+            else if(length == length12)
+            {
+                res_to_x = i.rect.left + 60*16;
+                res_to_y = i.rect.top;
+            }
+
+
+            else if(length == length20)
+            {
+                res_to_x = i.rect.left - 60*16;
+                res_to_y = i.rect.top  + 60*16;
+            }
+            else if(length == length21)
+            {
+                res_to_x = i.rect.left;
+                res_to_y = i.rect.top  + 60*16;
+            }
+            else if(length == length22)
+            {
+                res_to_x = i.rect.left + 60*16;
+                res_to_y = i.rect.top  + 60*16;
+            }
         }
     }
     //cout << "near_ done!" << endl;
+    //cout <<  " = " << res_to_x/16 << " = " <<res_to_y/16 << endl;
     return {res_to_x, res_to_y};
 }
 
 inline int to_cell(int x)// переводит координаты в <x, y> клетки
 {
-    return x/16;
+    x /= 16;
+    if(x < 0) x += 60;
+    return x % 60;
 }
 
 inline int to_position(int x)
 {
-    return x*16 + 8;
+    if(x < 0) x += 60;
+    x %= 60;
+    return (x*16 + 8)%(60*16);
 }
-
+/*
 inline bool look(vector<vector<char>>& mymap, int my_x, int my_y, int to_x, int to_y)//возвращает 1, если есть преграда
 {
-    /*
+
     // привожу координаты к центрам квадратиков
     my_x = to_position(my_x);
     my_y = to_position(my_y);
     to_x = to_position(to_x);
     to_y = to_position(to_y);
     ////////////////////////////////
-    */
+
 
     // перехожу к центрам фигурок
     my_x += 0;
@@ -301,11 +399,17 @@ inline bool look(vector<vector<char>>& mymap, int my_x, int my_y, int to_x, int 
 //cout << res << endl;
     return res;
 }
-
+*/
 
 
 Steps first_step(vector<vector<char>> mymap, int my_x, int my_y, int to_x, int to_y, Bot_conditions condition, const vector<Bullet>& bullets)
 {
+
+    long long int length   = (my_x - to_x)*(my_x - to_x)           + (my_y - to_y)*(my_y - to_y);
+    long long int length_L = (my_x - 16 - to_x)*(my_x - 16 - to_x) + (my_y - to_y)*(my_y - to_y);
+    long long int length_R = (my_x + 16 - to_x)*(my_x + 16 - to_x) + (my_y - to_y)*(my_y - to_y);
+    long long int length_U = (my_x - to_x)*(my_x - to_x)           + (my_y - 16 - to_y)*(my_y - 16 - to_y);
+    long long int length_D = (my_x - to_x)*(my_x - to_x)           + (my_y + 16 - to_y)*(my_y + 16 - to_y);
     //cout << bullets.size() << endl;
     for(const auto& i : bullets)
     {
@@ -315,19 +419,20 @@ Steps first_step(vector<vector<char>> mymap, int my_x, int my_y, int to_x, int t
         for(int dt = 0; dt < 15; dt++)
         {
 
-            int x_1 = to_rect_left/16;
-            int x_2 = (to_rect_left + i.rect.width)/16;
-            int y_1 = to_rect_top/16;
-            int y_2 = (to_rect_top + i.rect.height)/16;
-            //cout << "x_1 = " << x_1 << " x_2 = " << x_2 << " y_1 = " << y_1 << " y_2 = " << y_2 << endl;
-            if(mymap[y_1][x_1] != '1') mymap[y_1][x_1] = 'B';
-            else break;
-            if(mymap[y_1][x_2] != '1') mymap[y_1][x_2] = 'B';
-            else break;
-            if(mymap[y_2][x_1] != '1') mymap[y_2][x_1] = 'B';
-            else break;
-            if(mymap[y_2][x_2] != '1') mymap[y_2][x_2] = 'B';
-            else break;
+            int x_1 = (to_rect_left/16)%60;
+            int x_2 = (static_cast<int>((to_rect_left + i.rect.width)/16))%60;
+            int y_1 = (to_rect_top/16)%60;
+            int y_2 = (static_cast<int>((to_rect_top + i.rect.height)/16))%60;
+
+            if(x_1 < 0) x_1 += 60;
+            if(x_2 < 0) x_2 += 60;
+            if(y_1 < 0) y_1 += 60;
+            if(y_2 < 0) y_2 += 60;
+
+            mymap[y_1][x_1] = 'B';
+            mymap[y_1][x_2] = 'B';
+            mymap[y_2][x_1] = 'B';
+            mymap[y_2][x_2] = 'B';
 
             to_rect_left += static_cast<int>(i.dx * 10);
             to_rect_top  += static_cast<int>(i.dy * 10);
@@ -344,10 +449,12 @@ Steps first_step(vector<vector<char>> mymap, int my_x, int my_y, int to_x, int t
         }
         cout << endl;
     }
+    int zzz;
+    if(bullets.size() > 0) cin >> zzz;
     cout << "****************" << endl;
 */
     bool cond;
-    if(condition == WORNING) cond = 1;
+    if(condition == START) cond = 1;
     else cond = 0;
 
 //cout << "cond = " << cond << endl;
@@ -367,6 +474,7 @@ Steps first_step(vector<vector<char>> mymap, int my_x, int my_y, int to_x, int t
     mymap[to_i][to_j] = 'P'; //место противника
     if(mymap[my_i][my_j] == 'B')
     {
+        //cout << "x = 1!!" << endl;
         x = 1;
     }
     mymap[my_i][my_j] = 'I'; //место, где стою
@@ -378,7 +486,7 @@ Steps first_step(vector<vector<char>> mymap, int my_x, int my_y, int to_x, int t
     int res_j = my_j;
     /////////////////////////////////
     int kol = 0;
-    while(!Q.empty() && kol <= 40)
+    while(!Q.empty() && kol <= 4000)
     {
     kol++;
 //////////***********************
@@ -401,10 +509,15 @@ cout << "****************" << endl;
 
         int i = Q.front().second;
         int j = Q.front().first;
-        int i_down = i + 1;
-        int i_up = i - 1;
-        int j_right = j + 1;
-        int j_left = j - 1;
+        int i_down = (i + 1)%60;
+        int i_up = (i - 1)%60;
+        int j_right = (j + 1)%60;
+        int j_left = (j - 1)%60;
+
+        if(i_down < 0) i_down += 60;
+        if(i_up < 0) i_up += 60;
+        if(j_right < 0) j_right += 60;
+        if(j_left < 0) j_left += 60;
 
         /*
             L - пришли слева
@@ -412,15 +525,20 @@ cout << "****************" << endl;
             U - пришли сверху
             D - пишли снизу
         */
-
-        if(mymap[i][j_right] == '0' || (x && mymap[i][j_right] == 'B'))
+        if(mymap[i][j_right] == '0' || mymap[i][j_right] == 'P' || (x && mymap[i][j_right] == 'B'))
         {
 //cout << i << "," << j <<"->" << endl;
-            bool y = 0;
             Q.push(std::make_pair(j_right, i));
+
+            bool y = 0;
+            bool p = 0;
             if(x && mymap[i][j_right] == '0') y = 1;
+            if(mymap[i][j_right] == 'P') p = 1;
+            if(p && kol <= 164) break;
+
             mymap[i][j_right] = 'L';
-            if(look(mymap, j_right * 16, i * 16, to_x, to_y) == cond || y)// *16 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+//cout << "******* "<< mymap[i][j_right] << endl;
+            if(y || p)
             {
 //cout << "+" << endl;
                 res_i = i;
@@ -428,14 +546,19 @@ cout << "****************" << endl;
                 break;
             }
         }
-        if(mymap[i][j_left] == '0' || (x && mymap[i][j_right] == 'B'))
+        if(mymap[i][j_left] == '0' || mymap[i][j_left] == 'P' ||(x && mymap[i][j_left] == 'B'))
         {
 //cout << i << "," << j << "<-" << endl;
-            bool y = 0;
             Q.push(std::make_pair(j_left, i));
+
+            bool y = 0;
+            bool p = 0;
             if(x && mymap[i][j_left] == '0') y = 1;
+            if(mymap[i][j_left] == 'P') p = 1;
+            if(p && kol <= 164) break;
+
             mymap[i][j_left] = 'R';
-            if(look(mymap, j_left * 16, i * 16, to_x, to_y) == cond || y)// *16 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            if(y||p)
             {
 //cout << "++" << endl;
                 res_i = i;
@@ -443,14 +566,19 @@ cout << "****************" << endl;
                 break;
             }
         }
-        if(mymap[i_up][j] == '0' || (x && mymap[i][j_right] == 'B'))
+        if(mymap[i_up][j] == '0' || mymap[i_up][j] == 'P' ||(x && mymap[i_up][j] == 'B'))
         {
 //cout << i << "," << j << "^" << endl;
-            bool y = 0;
             Q.push(std::make_pair(j, i_up));
+
+            bool y = 0;
+            bool p = 0;
             if(x && mymap[i_up][j] == '0') y = 1;
+            if(mymap[i_up][j] == 'P') p = 1;
+            if(p && kol <= 164) break;
+
             mymap[i_up][j] = 'D';
-            if(look(mymap, j * 16, i_up * 16, to_x, to_y) == cond || y)// *16 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            if(y||p)
             {
 //cout << "+++" << endl;
                 res_i = i_up;
@@ -458,14 +586,19 @@ cout << "****************" << endl;
                 break;
             }
         }
-        if(mymap[i_down][j] == '0' || (x && mymap[i][j_right] == 'B'))
+        if(mymap[i_down][j] == '0' || mymap[i_down][j] == 'P' ||(x && mymap[i_down][j] == 'B'))
         {
 //cout << i << "," << j << "V" << endl;
-            bool y = 0;
             Q.push(std::make_pair(j, i_down));
+
+            bool y = 0;
+            bool p = 0;
             if(x && mymap[i_down][j] == '0') y = 1;
+            if(mymap[i_down][j] == 'P') p = 1;
+            if(p && kol <= 164) break;
+
             mymap[i_down][j] = 'U';
-            if(look(mymap, j * 16, i_down * 16, to_x, to_y) == cond || y)// *16 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            if(y||p)
             {
 //cout << "++++" << endl;
                 res_i = i_down;
@@ -481,7 +614,7 @@ cout << "****************" << endl;
 
      //////////***********************
 /*
-if(x)
+if(!x)
 {
     cout << "****************" << endl;
     for(auto& xline : mymap)
@@ -493,8 +626,10 @@ if(x)
         cout << endl;
     }
 cout << "****************" << endl;
+cout << "res_i = " << res_i << "res_j = " << res_j << endl;
 }
 */
+
 
     /////////***********************
 
@@ -507,18 +642,26 @@ cout << "****************" << endl;
         if(res == 'U')
         {
             res_i--;
+            res_i %= 60;
+            if(res_i < 0) res_i += 60;
         }
         if(res == 'D')
         {
             res_i++;
+            res_i %= 60;
+            if(res_i < 0) res_i += 60;
         }
         if(res == 'R')
         {
             res_j++;
+            res_j %= 60;
+            if(res_j < 0) res_j += 60;
         }
         if(res == 'L')
         {
             res_j--;
+            res_j %= 60;
+            if(res_j < 0) res_j += 60;
         }
     }
 
@@ -536,12 +679,20 @@ cout << "****************" << endl;
 cout << "****************" << endl;
 */
     /////////***********************
-
+    //cout << res << endl;
     if(res == 'U') return DOWN;
     else if(res == 'D') return UP;
     else if(res == 'R') return LEFT;
     else if(res == 'L') return RIGHT;
-    else return STOP;
+    else
+    {
+        int r = rand()%40;
+        if(r == 0 && length_D >= length) return DOWN;
+        else if(r == 1 && length_U >= length) return UP;
+        else if(r == 2 && length_L >= length) return LEFT;
+        else if(r == 3 && length_R >= length) return RIGHT;
+        else return STOP;
+    }
 }
 
 

@@ -50,7 +50,7 @@ void Draw() {
     bool click = false;
 
     Texture t;
-    t.loadFromFile("1.png");
+    t.loadFromFile("2.png");
     Sprite tile(t);
 
      // куда я сохраняю нашу сетку. откуда

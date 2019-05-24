@@ -16,7 +16,7 @@ public:
     Neuron() { value = 1; };
 
     float getSignal() {
-       // return (1 / (1 + exp(-(kernelFunction())))) ;
+        //return (1 / (1 + exp(-(kernelFunction())))) ;
         return kernelFunction();
     }
 
